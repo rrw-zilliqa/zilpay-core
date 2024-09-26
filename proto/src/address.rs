@@ -23,6 +23,11 @@ impl Address {
         Ok(Self::Secp256k1Sha256Zilliqa(addr))
     }
 
+    pub fn to_eth_checksummed(&self) -> Result<String, AddressError> {
+        let summed = H160::from_slice(&self.as_ref());
+        Ok(format!("{}", to_checksum(&summed, None)))
+    }
+
     pub fn from_pubkey(pk: &PubKey) -> Result<Self, AddressError> {
         match pk {
             PubKey::Secp256k1Sha256Zilliqa(pk) => {

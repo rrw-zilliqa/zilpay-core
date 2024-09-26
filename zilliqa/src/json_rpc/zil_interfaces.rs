@@ -21,3 +21,11 @@ pub struct GetBalanceRes {
     pub balance: String,
     pub nonce: u64,
 }
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateTransactionRes {
+    #[serde(rename = "Info")]
+    pub info: String,
+    #[serde(rename = "TranID")]
+    pub tranid: String,
+}

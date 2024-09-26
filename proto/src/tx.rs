@@ -18,10 +18,10 @@ pub enum TransactionRequest {
 }
 
 impl TransactionRequest {
-    pub fn sign(&self, keypair: &KeyPair) -> Result<TransactionReceipt, KeyPairError> {
+    pub fn sign(&self, keypair: &KeyPair) -> Result<TransactionRequest, KeyPairError> {
         match self {
             TransactionRequest::Zilliqa(tx) => {
-                let pub_key = keypair.get_pubkey()?;
+                let pub_key = &keypair.get_pubkey()?;
                 let bytes = encode_zilliqa_transaction(tx, pub_key);
                 let secret_key = keypair.get_secretkey()?.to_vec();
                 let secret_key = K256SecretKey::from_slice(&secret_key)
@@ -30,9 +30,9 @@ impl TransactionRequest {
                     .map_err(|e| KeyPairError::EthersInvalidSign(e.to_string()))?;
                 let signature = hex::encode(signature.to_bytes());
 
-                Ok(TransactionReceipt::Zilliqa(ZILTransactionReceipt {
+                Ok(TransactionRequest::Zilliqa(ZILTransactionRequest {
                     signature,
-                    chain_id: tx.chain_id,
+                    version: tx.version,
                     nonce: tx.nonce,
                     gas_price: tx.gas_price,
                     gas_limit: tx.gas_limit,
@@ -40,9 +40,13 @@ impl TransactionRequest {
                     amount: tx.amount,
                     code: tx.code.clone(),
                     data: tx.data.clone(),
+                    priority: tx.priority,
+                    // Remove first byte because that is the type byte.
+                    pubkey: format!("{}", pub_key)[2..].to_string(),
                 }))
             }
-            TransactionRequest::Ethereum(tx) => {
+
+            TransactionRequest::Ethereum(_tx) => {
                 unimplemented!()
             }
         }
