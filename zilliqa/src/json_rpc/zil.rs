@@ -175,8 +175,16 @@ mod tests {
 
     #[tokio::test]
     async fn test_transaction() {
+        // prototestnet = 335 (https://api.zq2-prototestnet.zilliqa.com/)
+        // testnet = 333 (https://dev-api.zilliqa.com/)
+
+        const URL: &str = "http://localhost:5556";
+        const CHAIN_ID: u16 = 335;
+        //const URL: &str = "http://localhost:5556";
+        //const CHAIN_ID: u16 = 333;
+
         //let zil = ZilliqaJsonRPC::new();
-        let zil = ZilliqaJsonRPC::from_vec(vec!["http://localhost:5556".to_string()]);
+        let zil = ZilliqaJsonRPC::from_vec(vec![URL.to_string()]);
         let secret_key_1_bytes: [u8; 32] = [
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 1,
@@ -185,20 +193,17 @@ mod tests {
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 2,
         ];
-        let secret_keys = vec![
+        let secret_keys = [
             SecretKey::Secp256k1Sha256Zilliqa(secret_key_1_bytes),
             SecretKey::Secp256k1Sha256Zilliqa(secret_key_2_bytes),
         ];
         let keypairs = secret_keys
             .iter()
-            .map(|x| KeyPair::from_secret_key(&x).unwrap())
+            .map(|x| KeyPair::from_secret_key(x).unwrap())
             .collect::<Vec<KeyPair>>();
         println!("Got a keypair!");
 
         const ONE_ZIL: u128 = 1_000_000_000_000u128;
-
-        // prototestnet = 335
-        // testnet = 333
 
         println!(
             "Sending 1 ZIL from {0} to {1}",
@@ -222,7 +227,7 @@ mod tests {
         println!("Nonce is {nonce}");
 
         let txn = tx::TransactionRequest::Zilliqa(ZILTransactionRequest::from_params(
-            333, // prototestnet
+            CHAIN_ID,
             nonce + 1,
             // Min gas price on testnet.
             ZilAmount::from_raw(2000000000),
