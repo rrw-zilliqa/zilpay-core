@@ -231,7 +231,7 @@ mod tests {
             nonce + 1,
             // Min gas price on testnet.
             ZilAmount::from_raw(2000000000),
-            ScillaGas(100000),
+            ScillaGas(1000),
             keypairs[1].get_addr().unwrap(),
             ZilAmount::from_raw(ONE_ZIL),
             None,
